@@ -13,21 +13,18 @@
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "server/src/index.js"
+      "source": "/api/(.*)",
+      "destination": "/server/src/index.js"
     },
     {
-      "src": "/uploads/(.*)",
-      "dest": "server/src/index.js"
+      "source": "/uploads/(.*)",
+      "destination": "/server/src/index.js"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!api|uploads|assets|favicon|shield).*)",
+      "destination": "/index.html"
     }
   ]
 }
