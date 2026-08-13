@@ -51,12 +51,20 @@ app.get('/api/health', (req, res) => {
 
 // Unified Static Serving for Client Frontend Bundle
 const clientDistPath = path.join(__dirname, '../../client/dist');
-if (fs.existsSync(clientDistPath)) {
-  app.use(express.static(clientDistPath));
-  app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
-      res.sendFile(path.join(clientDistPath, 'index.html'));
+const altClientDistPath = path.join(__dirname, '../client/dist');
+const actualDistPath = fs.existsSync(clientDistPath)
+  ? clientDistPath
+  : fs.existsSync(altClientDistPath)
+  ? altClientDistPath
+  : null;
+
+if (actualDistPath) {
+  app.use(express.static(actualDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
     }
+    res.sendFile(path.join(actualDistPath, 'index.html'));
   });
 } else {
   app.get('/', (req, res) => {
