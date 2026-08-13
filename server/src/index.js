@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -15,31 +16,21 @@ const userRoutes = require('./routes/user');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS
-app.use(cors());
+// Enable CORS with full preflight support
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+}));
+
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static uploaded files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-// Root Base URL Handler for Vercel
-app.get('/', (req, res) => {
-  res.json({
-    status: 'ok',
-    message: 'QuickCheck AI Backend API Engine is Operational',
-    health: '/api/health',
-    endpoints: {
-      auth: '/api/auth',
-      certificates: '/api/certificates',
-      verify: '/api/verify',
-      org: '/api/org',
-      admin: '/api/admin',
-      user: '/api/user'
-    },
-    timestamp: new Date().toISOString()
-  });
-});
 
 // Register API Routes
 app.use('/api/auth', authRoutes);
@@ -49,7 +40,7 @@ app.use('/api/org', orgRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
 
-// Root health check endpoint
+// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -57,6 +48,25 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Unified Static Serving for Client Frontend Bundle
+const clientDistPath = path.join(__dirname, '../../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+      res.sendFile(path.join(clientDistPath, 'index.html'));
+    }
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.json({
+      status: 'ok',
+      message: 'QuickCheck AI Unified Single-Domain API Server Operational',
+      health: '/api/health'
+    });
+  });
+}
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {
@@ -70,9 +80,8 @@ app.use((err, req, res, next) => {
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`====================================================`);
-    console.log(` QuickCheck AI Backend Server running on port ${PORT}`);
-    console.log(` API Endpoint: http://127.0.0.1:${PORT}/api`);
-    console.log(` Uploads static path: http://127.0.0.1:${PORT}/uploads`);
+    console.log(` QuickCheck AI Unified Single-Domain App running on port ${PORT}`);
+    console.log(` App & API URL: http://127.0.0.1:${PORT}`);
     console.log(`====================================================`);
   });
 }

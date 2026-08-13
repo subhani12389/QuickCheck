@@ -1,38 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Building2, Plus, ShieldCheck, AlertTriangle, FileCheck, CheckCircle2, XCircle, Search, QrCode, ExternalLink, Check, X } from 'lucide-react';
+import { Building2, Plus, ShieldCheck, AlertTriangle, FileCheck, CheckCircle2, XCircle, Search, QrCode, ExternalLink, Check, X, Copy, Users, Link as LinkIcon } from 'lucide-react';
 import { StatusBadge } from '../components/StatusBadge';
 import { QRModal } from '../components/QRModal';
+import { useAuth } from '../context/AuthContext';
 
 export const OrgDashboard = () => {
-  const [activeTab, setActiveTab] = useState('certificates'); // 'certificates' | 'reviews'
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('students'); // 'students' | 'certificates' | 'reviews'
   const [stats, setStats] = useState({
     totalIssued: 0,
     activeCount: 0,
     revokedCount: 0,
     verifiedCount: 0,
     suspiciousCount: 0,
+    studentSubmissionsCount: 0,
     pendingReviews: 0
   });
   
   const [certificates, setCertificates] = useState([]);
-  const [allVerifications, setAllVerifications] = useState([]);
+  const [studentVerifications, setStudentVerifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [selectedQR, setSelectedQR] = useState(null);
   const [reviewNotes, setReviewNotes] = useState('');
   const [processingId, setProcessingId] = useState(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const orgId = user?.orgId || 'org-1';
+  const portalLink = `${window.location.origin}/org/portal/${orgId}`;
 
   const fetchOrgData = async () => {
     try {
-      const [statsRes, certsRes, verifyRes] = await Promise.all([
+      const [statsRes, certsRes, studentRes] = await Promise.all([
         axios.get('/api/org/stats'),
         axios.get('/api/org/certificates'),
-        axios.get('/api/verify/public/res-203') // sample fetch
+        axios.get('/api/org/student-verifications')
       ]);
       setStats(statsRes.data);
       setCertificates(certsRes.data.certificates || []);
+      setStudentVerifications(studentRes.data.studentVerifications || []);
     } catch (err) {
       console.error('Failed to load org data:', err);
     } finally {
@@ -43,6 +51,12 @@ export const OrgDashboard = () => {
   useEffect(() => {
     fetchOrgData();
   }, []);
+
+  const handleCopyPortalLink = () => {
+    navigator.clipboard.writeText(portalLink);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2500);
+  };
 
   const handleReviewAction = async (verificationId, action) => {
     setProcessingId(verificationId);
@@ -67,54 +81,101 @@ export const OrgDashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-100">Organization Console</h1>
-          <p className="text-xs text-slate-400">Manage official certificate records and review AI-flagged suspicious verification requests</p>
+          <p className="text-xs text-slate-400">Share verification links with students, track verified student rosters, and manage certificate records</p>
         </div>
 
-        <Link
-          to="/org/upload"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all hover:scale-105"
-        >
-          <Plus className="w-4 h-4" /> Issue New Certificate Record
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/org/upload"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 font-bold text-xs transition-all"
+          >
+            <Plus className="w-4 h-4 text-indigo-400" /> Issue Master Record
+          </Link>
+          <button
+            onClick={handleCopyPortalLink}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all hover:scale-105"
+          >
+            {copiedLink ? <Check className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
+            {copiedLink ? 'Link Copied to Clipboard!' : 'Share Student Verification Link'}
+          </button>
+        </div>
+      </div>
+
+      {/* Shareable Student Verification Portal Link Card */}
+      <div className="glass-panel p-6 rounded-3xl border border-indigo-500/40 bg-gradient-to-r from-indigo-950/40 via-slate-900 to-sky-950/40 space-y-4 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-extrabold uppercase tracking-wider">
+              <Users className="w-3.5 h-3.5" /> Student Verification Portal Link
+            </span>
+            <h3 className="text-lg font-bold text-slate-100">Send this link to all your students to complete certificate verification</h3>
+            <p className="text-xs text-slate-400">Students opening this link can upload their certificate and every submission appears live in your Owner Roster below.</p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <input
+              type="text"
+              readOnly
+              value={portalLink}
+              className="px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-indigo-300 font-mono w-64 md:w-80 truncate focus:outline-none"
+            />
+            <button
+              onClick={handleCopyPortalLink}
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shrink-0"
+            >
+              {copiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copiedLink ? 'Copied' : 'Copy Link'}
+            </button>
+            <a
+              href={`/org/portal/${orgId}`}
+              target="_blank"
+              rel="noreferrer"
+              className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+              title="Open portal as student"
+            >
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Org Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
+        <div className="glass-card p-6 rounded-3xl space-y-2 border border-indigo-500/30">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400">Verified Student Submissions</span>
+            <Users className="w-5 h-5 text-indigo-400" />
+          </div>
+          <p className="text-3xl font-extrabold text-indigo-400">{studentVerifications.length}</p>
+          <p className="text-[11px] text-slate-500">Submitted via student link</p>
+        </div>
+
         <div className="glass-card p-6 rounded-3xl space-y-2 border border-slate-800">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Issued Certs</span>
-            <Building2 className="w-5 h-5 text-indigo-400" />
+            <Building2 className="w-5 h-5 text-slate-400" />
           </div>
           <p className="text-3xl font-extrabold text-slate-100">{stats.totalIssued}</p>
-          <p className="text-[11px] text-slate-500">Registered master templates</p>
+          <p className="text-[11px] text-slate-500">Master registered records</p>
         </div>
 
         <div className="glass-card p-6 rounded-3xl space-y-2 border border-emerald-500/20">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Active Records</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Verified Authentic</span>
             <ShieldCheck className="w-5 h-5 text-emerald-400" />
           </div>
-          <p className="text-3xl font-extrabold text-emerald-400">{stats.activeCount}</p>
-          <p className="text-[11px] text-slate-500">Publicly verifiable</p>
+          <p className="text-3xl font-extrabold text-emerald-400">{stats.verifiedCount}</p>
+          <p className="text-[11px] text-slate-500">Original certificates verified</p>
         </div>
 
         <div className="glass-card p-6 rounded-3xl space-y-2 border border-amber-500/20">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">Pending Manual Reviews</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">Pending Reviews</span>
             <AlertTriangle className="w-5 h-5 text-amber-400" />
           </div>
           <p className="text-3xl font-extrabold text-amber-400">{stats.pendingReviews}</p>
           <p className="text-[11px] text-slate-500">Flagged suspicious cases</p>
-        </div>
-
-        <div className="glass-card p-6 rounded-3xl space-y-2 border border-sky-500/20">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-sky-400">Verified Requests</span>
-            <FileCheck className="w-5 h-5 text-sky-400" />
-          </div>
-          <p className="text-3xl font-extrabold text-sky-400">{stats.verifiedCount}</p>
-          <p className="text-[11px] text-slate-500">User checks passed</p>
         </div>
 
       </div>
@@ -122,6 +183,17 @@ export const OrgDashboard = () => {
       {/* Tabs Selector */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-2">
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveTab('students')}
+            className={`px-5 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'students'
+                ? 'bg-indigo-600 text-white shadow-lg'
+                : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+            }`}
+          >
+            <Users className="w-4 h-4" /> Student Verification Roster ({studentVerifications.length})
+          </button>
+
           <button
             onClick={() => setActiveTab('certificates')}
             className={`px-5 py-2.5 rounded-2xl text-xs font-bold transition-all ${
@@ -150,6 +222,77 @@ export const OrgDashboard = () => {
           </button>
         </div>
       </div>
+
+      {/* Tab 0: Student Verifications Roster */}
+      {activeTab === 'students' && (
+        <div className="glass-panel p-6 rounded-3xl border border-slate-800 space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-slate-100">Student Verification Submissions Roster</h3>
+              <p className="text-xs text-slate-400">Live roster of all students who completed certificate verification via your link</p>
+            </div>
+            <button
+              onClick={handleCopyPortalLink}
+              className="px-4 py-2 rounded-xl bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white font-semibold text-xs transition-colors flex items-center gap-1.5"
+            >
+              <Copy className="w-3.5 h-3.5" /> Copy Portal Link
+            </button>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-12 text-xs text-slate-400">Loading student roster...</div>
+          ) : studentVerifications.length === 0 ? (
+            <div className="text-center py-12 text-xs text-slate-400 space-y-3">
+              <p>No student verifications received yet.</p>
+              <p className="text-[11px] text-indigo-300">Share your student verification portal link with your students to populate this roster!</p>
+              <button
+                onClick={handleCopyPortalLink}
+                className="inline-block px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold"
+              >
+                Copy Student Verification Link
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
+                    <th className="pb-3 px-4">Student Name</th>
+                    <th className="pb-3 px-4">Student Email</th>
+                    <th className="pb-3 px-4">Cert / Roll ID</th>
+                    <th className="pb-3 px-4">AI Score</th>
+                    <th className="pb-3 px-4">Verdict Status</th>
+                    <th className="pb-3 px-4">Submission Date</th>
+                    <th className="pb-3 px-4 text-right">Audit Report</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {studentVerifications.map((item) => (
+                    <tr key={item.id} className="hover:bg-slate-900/60 transition-colors">
+                      <td className="py-3.5 px-4 font-semibold text-slate-200">{item.studentName || item.holderName}</td>
+                      <td className="py-3.5 px-4 text-slate-400">{item.studentEmail || 'student@school.edu'}</td>
+                      <td className="py-3.5 px-4 font-mono font-bold text-indigo-300">{item.certificateId}</td>
+                      <td className="py-3.5 px-4 font-extrabold text-slate-100">{item.confidenceScore}%</td>
+                      <td className="py-3.5 px-4">
+                        <StatusBadge verdict={item.verdict} score={item.confidenceScore} showIcon={false} />
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-400">{new Date(item.verifiedAt || Date.now()).toLocaleDateString()}</td>
+                      <td className="py-3.5 px-4 text-right">
+                        <Link
+                          to={`/verify/result/${item.id}`}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-[11px] transition-colors"
+                        >
+                          View Report <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tab 1: Certificates Master List */}
       {activeTab === 'certificates' && (

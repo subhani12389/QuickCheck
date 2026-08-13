@@ -1,9 +1,151 @@
 const express = require('express');
 const crypto = require('crypto');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const store = require('../db/store');
 const { authMiddleware, requireRole } = require('../middleware/auth');
+const { analyzeCertificateDocument } = require('../services/aiService');
 
 const router = express.Router();
+
+const uploadDir = path.join(__dirname, '../../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `portal-${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }
+});
+
+/**
+ * GET /api/org/portal/:orgIdOrCode
+ * Public endpoint to fetch organization branding for student portal
+ */
+router.get('/portal/:orgIdOrCode', (req, res) => {
+  const param = req.params.orgIdOrCode.toUpperCase();
+  const orgs = store.getAllOrgs();
+  const org = orgs.find(o => o.id === req.params.orgIdOrCode || o.code === param || o.id === `org-${req.params.orgIdOrCode}`);
+  
+  if (!org) {
+    return res.status(404).json({ error: 'Organization portal not found' });
+  }
+
+  return res.json({
+    organization: {
+      id: org.id,
+      name: org.name,
+      code: org.code,
+      website: org.website,
+      contactEmail: org.contactEmail,
+      signatoryName: org.signatoryName,
+      logoUrl: org.logoUrl
+    }
+  });
+});
+
+/**
+ * POST /api/org/portal-verify/:orgIdOrCode
+ * Student submits certificate document via Organization Verification Portal Link
+ */
+router.post('/portal-verify/:orgIdOrCode', upload.single('file'), async (req, res) => {
+  try {
+    const param = req.params.orgIdOrCode.toUpperCase();
+    const orgs = store.getAllOrgs();
+    const org = orgs.find(o => o.id === req.params.orgIdOrCode || o.code === param || o.id === `org-${req.params.orgIdOrCode}`);
+
+    if (!org) {
+      return res.status(404).json({ error: 'Invalid organization verification link' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Please select a certificate PDF or image document to upload' });
+    }
+
+    const { studentName, studentEmail, certificateId, courseAward } = req.body;
+
+    if (!studentName || !studentEmail) {
+      return res.status(400).json({ error: 'Student Name and Email Address are required' });
+    }
+
+    const userInputs = {
+      certificateId,
+      holderName: studentName,
+      issuerName: org.name,
+      courseAward
+    };
+
+    // Run AI analysis pipeline
+    const aiResult = await analyzeCertificateDocument(req.file.path, req.file.originalname, userInputs);
+
+    const resId = 'res-' + Date.now();
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(resId)}`;
+    const publicVerifyUrl = `/verify/${resId}`;
+
+    const verificationRecord = {
+      id: resId,
+      requestId: 'req-portal-' + Date.now(),
+      userId: 'student-portal',
+      orgId: org.id,
+      studentName,
+      studentEmail,
+      certificateId: certificateId || 'N/A',
+      holderName: studentName,
+      issuerName: org.name,
+      courseAward: courseAward || 'Student Certificate',
+      issueDate: new Date().toISOString().split('T')[0],
+      confidenceScore: aiResult.confidenceScore,
+      verdict: aiResult.verdict,
+      detectedAnomalies: aiResult.anomalies || [],
+      positiveIndicators: aiResult.positiveIndicators || [],
+      forensicDetails: aiResult.forensicDetails || {},
+      ocr: aiResult.ocr || {},
+      fileUrl: `/uploads/${req.file.filename}`,
+      fileName: req.file.originalname,
+      qrCodeUrl,
+      publicVerifyUrl,
+      submittedViaPortal: true,
+      verifiedAt: new Date().toISOString()
+    };
+
+    store.addVerificationResult(verificationRecord);
+    store.logAudit(
+      'student-portal',
+      studentEmail,
+      'STUDENT_PORTAL_VERIFY',
+      `Student ${studentName} (${studentEmail}) completed certificate verification for ${org.name}. Result: ${verificationRecord.verdict} (${verificationRecord.confidenceScore}%)`
+    );
+
+    return res.json({
+      message: 'Student verification submitted successfully to organization registry',
+      result: verificationRecord
+    });
+  } catch (err) {
+    console.error('Portal verify error:', err);
+    return res.status(500).json({ error: 'Failed to complete student verification' });
+  }
+});
+
+/**
+ * GET /api/org/student-verifications
+ * Returns all student verification records submitted to this organization owner
+ */
+router.get('/student-verifications', authMiddleware, requireRole(['organization', 'admin']), (req, res) => {
+  const orgId = req.user.orgId || 'org-1';
+  const allVerifications = store.getAllVerifications();
+  const studentVerifications = allVerifications.filter(v => v.orgId === orgId || v.issuerName.toLowerCase().includes('stanford'));
+
+  return res.json({ studentVerifications });
+});
 
 /**
  * GET /api/org/certificates
@@ -68,7 +210,7 @@ router.post('/certificates', authMiddleware, requireRole(['organization', 'admin
  */
 router.patch('/certificates/:id/review', authMiddleware, requireRole(['organization', 'admin']), (req, res) => {
   try {
-    const { action, reviewNotes } = req.body; // action: 'approve' | 'reject'
+    const { action, reviewNotes } = req.body;
     const verificationId = req.params.id;
 
     if (!['approve', 'reject'].includes(action)) {
@@ -109,8 +251,9 @@ router.get('/stats', authMiddleware, requireRole(['organization', 'admin']), (re
   const activeCount = certs.filter(c => c.status === 'active').length;
   const revokedCount = certs.filter(c => c.status === 'revoked').length;
 
-  const verifiedCount = allVerifications.filter(v => v.verdict === 'Original').length;
-  const suspiciousCount = allVerifications.filter(v => v.verdict === 'Suspicious').length;
+  const orgVerifications = allVerifications.filter(v => v.orgId === orgId || v.issuerName.toLowerCase().includes('stanford'));
+  const verifiedCount = orgVerifications.filter(v => v.verdict === 'Original').length;
+  const suspiciousCount = orgVerifications.filter(v => v.verdict === 'Suspicious').length;
 
   return res.json({
     totalIssued,
@@ -118,6 +261,7 @@ router.get('/stats', authMiddleware, requireRole(['organization', 'admin']), (re
     revokedCount,
     verifiedCount,
     suspiciousCount,
+    studentSubmissionsCount: orgVerifications.length,
     pendingReviews: suspiciousCount
   });
 });

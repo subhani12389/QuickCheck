@@ -14,6 +14,7 @@ import { VerifyResultPage } from './pages/VerifyResultPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { OrgDashboard } from './pages/OrgDashboard';
 import { OrgUploadCertPage } from './pages/OrgUploadCertPage';
+import { OrgStudentPortalPage } from './pages/OrgStudentPortalPage';
 import { PublicVerifyPage } from './pages/PublicVerifyPage';
 import { AdminDashboard } from './pages/AdminDashboard';
 
@@ -41,6 +42,10 @@ export function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/verify/public/:idOrHash" element={<PublicVerifyPage />} />
                 <Route path="/v/:idOrHash" element={<PublicVerifyPage />} />
+
+                {/* Organization Student Portal Links (Public) */}
+                <Route path="/org/portal/:orgId" element={<OrgStudentPortalPage />} />
+                <Route path="/v/org/:orgId" element={<OrgStudentPortalPage />} />
 
                 {/* User Protected Routes */}
                 <Route path="/dashboard" element={
