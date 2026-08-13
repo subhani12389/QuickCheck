@@ -1,0 +1,535 @@
+{
+  "users": [
+    {
+      "id": "user-admin",
+      "name": "Alex Rivera (Admin)",
+      "email": "admin@quickcheck.ai",
+      "passwordHash": "$2a$10$xbqPX0xmhlvd1W71RKFGJeZbFY1ByPZ672S3VdRoxmDw3hRKeJSeC",
+      "role": "admin",
+      "orgId": null,
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "createdAt": "2026-05-05T05:50:55.277Z"
+    },
+    {
+      "id": "user-org-stanford",
+      "name": "Sarah Connor (Stanford)",
+      "email": "org@stanford.edu",
+      "passwordHash": "$2a$10$xbqPX0xmhlvd1W71RKFGJeZbFY1ByPZ672S3VdRoxmDw3hRKeJSeC",
+      "role": "organization",
+      "orgId": "org-1",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      "createdAt": "2026-05-15T05:50:55.277Z"
+    },
+    {
+      "id": "user-org-google",
+      "name": "David Vance (Google Cloud)",
+      "email": "org@google.com",
+      "passwordHash": "$2a$10$xbqPX0xmhlvd1W71RKFGJeZbFY1ByPZ672S3VdRoxmDw3hRKeJSeC",
+      "role": "organization",
+      "orgId": "org-2",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "createdAt": "2026-06-14T05:50:55.277Z"
+    },
+    {
+      "id": "user-end",
+      "name": "John Doe",
+      "email": "user@quickcheck.ai",
+      "passwordHash": "$2a$10$xbqPX0xmhlvd1W71RKFGJeZbFY1ByPZ672S3VdRoxmDw3hRKeJSeC",
+      "role": "end_user",
+      "orgId": null,
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      "createdAt": "2026-07-14T05:50:55.277Z"
+    },
+    {
+      "id": "user-1786600871884",
+      "name": "subhani",
+      "email": "sk5826314@gmail.com",
+      "passwordHash": "$2a$10$S041201VDW/OhRcbUyMXVupXLhDsIM3TeExTAtefzAaS2N6x0sxJu",
+      "role": "end_user",
+      "orgId": null,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=subhani",
+      "createdAt": "2026-08-13T06:01:12.236Z"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org-1",
+      "name": "Stanford Online Academy",
+      "code": "STANFORD",
+      "website": "https://online.stanford.edu",
+      "contactEmail": "verify@stanford.edu",
+      "signatoryName": "Prof. Andrew Ng",
+      "signatoryTitle": "Director of AI Institute",
+      "logoUrl": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=200&auto=format&fit=crop&q=80",
+      "isVerified": true,
+      "createdAt": "2026-05-15T05:50:55.276Z"
+    },
+    {
+      "id": "org-2",
+      "name": "Google Cloud Academy",
+      "code": "GOOGLECLOUD",
+      "website": "https://cloud.google.com/training",
+      "contactEmail": "certifications@google.com",
+      "signatoryName": "Sundar Pichai",
+      "signatoryTitle": "Chief Executive Officer",
+      "logoUrl": "https://images.unsplash.com/photo-1573164713988-8665fc963095?w=200&auto=format&fit=crop&q=80",
+      "isVerified": true,
+      "createdAt": "2026-06-14T05:50:55.277Z"
+    },
+    {
+      "id": "org-3",
+      "name": "MIT Executive Education",
+      "code": "MITEXEC",
+      "website": "https://executive.mit.edu",
+      "contactEmail": "credentials@mit.edu",
+      "signatoryName": "Dr. L. Rafael Reif",
+      "signatoryTitle": "President Emeritus",
+      "logoUrl": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=200&auto=format&fit=crop&q=80",
+      "isVerified": true,
+      "createdAt": "2026-07-14T05:50:55.277Z"
+    }
+  ],
+  "certificates": [
+    {
+      "id": "cert-101",
+      "certificateId": "ST-AI-2024-8890",
+      "holderName": "John Doe",
+      "courseAward": "Advanced Machine Learning & Neural Networks",
+      "orgId": "org-1",
+      "orgName": "Stanford Online Academy",
+      "issueDate": "2024-05-15",
+      "signatoryName": "Prof. Andrew Ng",
+      "documentHash": "fce85a1b1cc1a0384cf411a1d6638e553664d0f8ab73d91dc6991eee67d34d5d",
+      "status": "active",
+      "createdAt": "2026-07-24T05:50:55.279Z"
+    },
+    {
+      "id": "cert-102",
+      "certificateId": "GCC-ARCH-9902",
+      "holderName": "Jane Smith",
+      "courseAward": "Professional Cloud Architect Certification",
+      "orgId": "org-2",
+      "orgName": "Google Cloud Academy",
+      "issueDate": "2024-03-10",
+      "signatoryName": "Sundar Pichai",
+      "documentHash": "71e15b1825dcd9223c1b3ef63578ddf4454b66d2f1757d2d1df25265c4a5a03c",
+      "status": "active",
+      "createdAt": "2026-07-04T05:50:55.279Z"
+    },
+    {
+      "id": "cert-103",
+      "certificateId": "MIT-CS-5541",
+      "holderName": "Michael Chen",
+      "courseAward": "Executive Certificate in Artificial Intelligence",
+      "orgId": "org-3",
+      "orgName": "MIT Executive Education",
+      "issueDate": "2024-01-20",
+      "signatoryName": "Dr. L. Rafael Reif",
+      "documentHash": "8de279732da0dbf9b5cd1733ce505a69d08b6d0267b6b47044296bc656594b1a",
+      "status": "active",
+      "createdAt": "2026-06-24T05:50:55.279Z"
+    }
+  ],
+  "verificationResults": [
+    {
+      "id": "res-1786601873728",
+      "requestId": "req-1786601873728",
+      "userId": "user-1786600871884",
+      "certificateId": "101575751JAVA8OJA",
+      "holderName": "subhani shaik",
+      "issuerName": "MongoDB , inc.",
+      "courseAward": "Certificate Document",
+      "issueDate": "2026-06-04",
+      "confidenceScore": 98,
+      "verdict": "Original",
+      "detectedAnomalies": [],
+      "positiveIndicators": [
+        "No editing software signatures (Photoshop, Canva, GIMP) detected in document metadata.",
+        "Document structure and layout formatting verified as clean and authentic.",
+        "Error Level Analysis (ELA) compression ratio is uniform (1.12x). No spliced text patches detected."
+      ],
+      "forensicDetails": {
+        "elaVariance": 1.12,
+        "noiseVariance": 220.4,
+        "editingSoftwareDetected": false,
+        "hashMatched": false,
+        "recordFound": false
+      },
+      "ocr": {
+        "raw_text": "Certificate ID: 101575751JAVA8OJA - Holder: subhani shaik",
+        "extracted_cert_id": "101575751JAVA8OJA"
+      },
+      "fileUrl": "/uploads/verify-1786601870672-638660097.pdf",
+      "fileName": "mangodb-certificate.pdf",
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=res-1786601873728",
+      "publicVerifyUrl": "/verify/res-1786601873728",
+      "verifiedAt": "2026-08-13T06:17:53.728Z"
+    },
+    {
+      "id": "res-1786601735709",
+      "requestId": "req-1786601735709",
+      "userId": "user-1786600871884",
+      "certificateId": "101575751JAVA8OJA",
+      "holderName": "subhani shaik",
+      "issuerName": "oracle university",
+      "courseAward": "Certificate Document",
+      "issueDate": "2025-05-16",
+      "confidenceScore": 98,
+      "verdict": "Original",
+      "detectedAnomalies": [],
+      "positiveIndicators": [
+        "No editing software signatures (Photoshop, Canva, GIMP) detected in document metadata.",
+        "Document structure and layout formatting verified as clean and authentic.",
+        "Error Level Analysis (ELA) compression ratio is uniform (1.12x). No spliced text patches detected."
+      ],
+      "forensicDetails": {
+        "elaVariance": 1.12,
+        "noiseVariance": 220.4,
+        "editingSoftwareDetected": false,
+        "hashMatched": false,
+        "recordFound": false
+      },
+      "ocr": {
+        "raw_text": "Certificate ID: 101575751JAVA8OJA - Holder: subhani shaik",
+        "extracted_cert_id": "101575751JAVA8OJA"
+      },
+      "fileUrl": "/uploads/verify-1786601732624-997568627.pdf",
+      "fileName": "eCertificate.pdf",
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=res-1786601735709",
+      "publicVerifyUrl": "/verify/res-1786601735709",
+      "verifiedAt": "2026-08-13T06:15:35.709Z"
+    },
+    {
+      "id": "res-1786601646138",
+      "requestId": "req-1786601646138",
+      "userId": "user-end",
+      "certificateId": "N/A",
+      "holderName": "John Doe",
+      "issuerName": "Unknown Issuer",
+      "courseAward": "Certificate Document",
+      "issueDate": "2026-08-13",
+      "confidenceScore": 98,
+      "verdict": "Original",
+      "detectedAnomalies": [],
+      "positiveIndicators": [
+        "No editing software signatures (Photoshop, Canva, GIMP) detected in document metadata.",
+        "Document structure and layout formatting verified as clean and authentic.",
+        "Error Level Analysis (ELA) compression ratio is uniform (1.12x). No spliced text patches detected."
+      ],
+      "forensicDetails": {
+        "elaVariance": 1.12,
+        "noiseVariance": 220.4,
+        "editingSoftwareDetected": false,
+        "hashMatched": false,
+        "recordFound": false
+      },
+      "ocr": {
+        "raw_text": "Certificate ID: content - Holder: John Doe",
+        "extracted_cert_id": "content"
+      },
+      "fileUrl": "/uploads/verify-1786601643036-437402452.pdf",
+      "fileName": "clean_cert.pdf",
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=res-1786601646138",
+      "publicVerifyUrl": "/verify/res-1786601646138",
+      "verifiedAt": "2026-08-13T06:14:06.138Z"
+    },
+    {
+      "id": "res-1786601523677",
+      "requestId": "req-1786601523677",
+      "userId": "user-end",
+      "certificateId": "N/A",
+      "holderName": "John Doe",
+      "issuerName": "Unknown Issuer",
+      "courseAward": "Certificate Document",
+      "issueDate": "2026-08-13",
+      "confidenceScore": 68,
+      "verdict": "Suspicious",
+      "detectedAnomalies": [
+        "[Forensics] Document size abnormally small; potential low-quality crop or partial composite."
+      ],
+      "positiveIndicators": [
+        "No editing software signatures (Photoshop, Canva, GIMP) detected in document metadata.",
+        "Document structure and layout formatting verified as clean and authentic."
+      ],
+      "forensicDetails": {
+        "elaVariance": 1.12,
+        "noiseVariance": 220.4,
+        "editingSoftwareDetected": false,
+        "hashMatched": false,
+        "recordFound": false
+      },
+      "ocr": {
+        "raw_text": "Certificate ID: content - Holder: John Doe",
+        "extracted_cert_id": "content"
+      },
+      "fileUrl": "/uploads/verify-1786601520613-180633962.pdf",
+      "fileName": "clean_cert.pdf",
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=res-1786601523677",
+      "publicVerifyUrl": "/verify/res-1786601523677",
+      "verifiedAt": "2026-08-13T06:12:03.677Z"
+    },
+    {
+      "id": "res-1786601357850",
+      "requestId": "req-1786601357850",
+      "userId": "user-1786600871884",
+      "certificateId": "101575751JAVA8OJA",
+      "holderName": "subhani shaik",
+      "issuerName": "oracle university",
+      "courseAward": "Certificate Document",
+      "issueDate": "2025-05-16",
+      "confidenceScore": 60,
+      "verdict": "Suspicious",
+      "detectedAnomalies": [
+        "Certificate ID not registered in official organization database."
+      ],
+      "positiveIndicators": [],
+      "forensicDetails": {
+        "elaVariance": 1.8,
+        "noiseVariance": 250,
+        "editingSoftwareDetected": false,
+        "hashMatched": false,
+        "recordFound": false
+      },
+      "ocr": {
+        "raw_text": "Certificate ID: 101575751JAVA8OJA - Holder: subhani shaik",
+        "extracted_cert_id": "101575751JAVA8OJA"
+      },
+      "fileUrl": "/uploads/verify-1786601354768-248860296.pdf",
+      "fileName": "eCertificate.pdf",
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=res-1786601357850",
+      "publicVerifyUrl": "/verify/res-1786601357850",
+      "verifiedAt": "2026-08-13T06:09:17.850Z"
+    },
+    {
+      "id": "res-1786601255009",
+      "requestId": "req-1786601255009",
+      "userId": "user-1786600871884",
+      "certificateId": "101575751JAVA8OJA",
+      "holderName": "subhani shaik",
+      "issuerName": "oracle",
+      "courseAward": "Certificate Document",
+      "issueDate": "2025-05-16",
+      "confidenceScore": 60,
+      "verdict": "Suspicious",
+      "detectedAnomalies": [
+        "Certificate ID not registered in official organization database."
+      ],
+      "positiveIndicators": [],
+      "forensicDetails": {
+        "elaVariance": 1.8,
+        "noiseVariance": 250,
+        "editingSoftwareDetected": false,
+        "hashMatched": false,
+        "recordFound": false
+      },
+      "ocr": {
+        "raw_text": "Certificate ID: 101575751JAVA8OJA - Holder: subhani shaik",
+        "extracted_cert_id": "101575751JAVA8OJA"
+      },
+      "fileUrl": "/uploads/verify-1786601251869-385189899.pdf",
+      "fileName": "mangodb-certificate.pdf",
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=res-1786601255009",
+      "publicVerifyUrl": "/verify/res-1786601255009",
+      "verifiedAt": "2026-08-13T06:07:35.009Z"
+    },
+    {
+      "id": "res-201",
+      "requestId": "req-301",
+      "userId": "user-end",
+      "certificateId": "ST-AI-2024-8890",
+      "holderName": "John Doe",
+      "issuerName": "Stanford Online Academy",
+      "courseAward": "Advanced Machine Learning & Neural Networks",
+      "issueDate": "2024-05-15",
+      "confidenceScore": 98,
+      "verdict": "Original",
+      "detectedAnomalies": [],
+      "positiveIndicators": [
+        "Cryptographic document hash (SHA-256) matches master template.",
+        "Certificate ID verified in official registered database records.",
+        "Holder name matched with 100% precision.",
+        "No editing software footprint detected."
+      ],
+      "forensicDetails": {
+        "elaVariance": 1.12,
+        "noiseVariance": 220.4,
+        "editingSoftwareDetected": false,
+        "hashMatched": true,
+        "recordFound": true
+      },
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=res-201",
+      "publicVerifyUrl": "/verify/res-201",
+      "verifiedAt": "2026-08-11T05:50:55.279Z"
+    },
+    {
+      "id": "res-202",
+      "requestId": "req-302",
+      "userId": "user-end",
+      "certificateId": "GCC-ARCH-9902",
+      "holderName": "Jane Smith (Altered)",
+      "issuerName": "Google Cloud Academy",
+      "courseAward": "Professional Cloud Architect Certification",
+      "issueDate": "2024-03-10",
+      "confidenceScore": 42,
+      "verdict": "Fake",
+      "detectedAnomalies": [
+        "Certificate ID does not match registered holder name.",
+        "[Forensics] High compression variance detected (ELA spike). Spliced text detected near holder name.",
+        "[Metadata] Editing software signature detected: Adobe Photoshop 2023."
+      ],
+      "positiveIndicators": [
+        "Certificate ID exists in database."
+      ],
+      "forensicDetails": {
+        "elaVariance": 14.8,
+        "noiseVariance": 1450,
+        "editingSoftwareDetected": true,
+        "hashMatched": false,
+        "recordFound": true
+      },
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=res-202",
+      "publicVerifyUrl": "/verify/res-202",
+      "verifiedAt": "2026-08-12T05:50:55.279Z"
+    },
+    {
+      "id": "res-203",
+      "requestId": "req-303",
+      "userId": "user-end",
+      "certificateId": "UNKNOWN-9999",
+      "holderName": "Robert Paulson",
+      "issuerName": "Unverified Academy",
+      "courseAward": "Cybersecurity Masterclass",
+      "issueDate": "2024-06-01",
+      "confidenceScore": 68,
+      "verdict": "Suspicious",
+      "detectedAnomalies": [
+        "Certificate ID not found in official registered database records.",
+        "[Metadata] Document modification date differs from creation timestamp."
+      ],
+      "positiveIndicators": [
+        "No spliced text or ELA compression anomalies detected."
+      ],
+      "forensicDetails": {
+        "elaVariance": 3.2,
+        "noiseVariance": 400,
+        "editingSoftwareDetected": false,
+        "hashMatched": false,
+        "recordFound": false
+      },
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=res-203",
+      "publicVerifyUrl": "/verify/res-203",
+      "verifiedAt": "2026-08-10T05:50:55.279Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "log-1786601873734",
+      "userId": "user-1786600871884",
+      "userEmail": "sk5826314@gmail.com",
+      "action": "VERIFY_CERTIFICATE",
+      "details": "Verified certificate 101575751JAVA8OJA. Result: Original (Score: 98%)",
+      "ipAddress": "127.0.0.1",
+      "timestamp": "2026-08-13T06:17:53.735Z"
+    },
+    {
+      "id": "log-1786601735714",
+      "userId": "user-1786600871884",
+      "userEmail": "sk5826314@gmail.com",
+      "action": "VERIFY_CERTIFICATE",
+      "details": "Verified certificate 101575751JAVA8OJA. Result: Original (Score: 98%)",
+      "ipAddress": "127.0.0.1",
+      "timestamp": "2026-08-13T06:15:35.714Z"
+    },
+    {
+      "id": "log-1786601646139",
+      "userId": "user-end",
+      "userEmail": "user@quickcheck.ai",
+      "action": "VERIFY_CERTIFICATE",
+      "details": "Verified certificate N/A. Result: Original (Score: 98%)",
+      "ipAddress": "127.0.0.1",
+      "timestamp": "2026-08-13T06:14:06.139Z"
+    },
+    {
+      "id": "log-1786601642945",
+      "userId": "user-end",
+      "userEmail": "user@quickcheck.ai",
+      "action": "USER_LOGIN",
+      "details": "User logged in successfully",
+      "ipAddress": "127.0.0.1",
+      "timestamp": "2026-08-13T06:14:02.945Z"
+    },
+    {
+      "id": "log-1786601523679",
+      "userId": "user-end",
+      "userEmail": "user@quickcheck.ai",
+      "action": "VERIFY_CERTIFICATE",
+      "details": "Verified certificate N/A. Result: Suspicious (Score: 68%)",
+      "ipAddress": "127.0.0.1",
+      "timestamp": "2026-08-13T06:12:03.679Z"
+    },
+    {
+      "id": "log-1786601520583",
+      "userId": "user-end",
+      "userEmail": "user@quickcheck.ai",
+      "action": "USER_LOGIN",
+      "details": "User logged in successfully",
+      "ipAddress": "127.0.0.1",
+      "timestamp": "2026-08-13T06:12:00.583Z"
+    },
+    {
+      "id": "log-1786601357855",
+      "userId": "user-1786600871884",
+      "userEmail": "sk5826314@gmail.com",
+      "action": "VERIFY_CERTIFICATE",
+      "details": "Verified certificate 101575751JAVA8OJA. Result: Suspicious (Score: 60%)",
+      "ipAddress": "127.0.0.1",
+      "timestamp": "2026-08-13T06:09:17.855Z"
+    },
+    {
+      "id": "log-1786601255014",
+      "userId": "user-1786600871884",
+      "userEmail": "sk5826314@gmail.com",
+      "action": "VERIFY_CERTIFICATE",
+      "details": "Verified certificate 101575751JAVA8OJA. Result: Suspicious (Score: 60%)",
+      "ipAddress": "127.0.0.1",
+      "timestamp": "2026-08-13T06:07:35.014Z"
+    },
+    {
+      "id": "log-1786600872239",
+      "userId": "user-1786600871884",
+      "userEmail": "sk5826314@gmail.com",
+      "action": "USER_REGISTERED",
+      "details": "User account created (end_user)",
+      "ipAddress": "127.0.0.1",
+      "timestamp": "2026-08-13T06:01:12.239Z"
+    },
+    {
+      "id": "log-1",
+      "userId": "user-end",
+      "userEmail": "user@quickcheck.ai",
+      "action": "VERIFY_CERTIFICATE",
+      "details": "Verified certificate ST-AI-2024-8890. Result: Original (Score: 98)",
+      "ipAddress": "192.168.1.45",
+      "timestamp": "2026-08-11T05:50:55.279Z"
+    },
+    {
+      "id": "log-2",
+      "userId": "user-org-stanford",
+      "userEmail": "org@stanford.edu",
+      "action": "CREATE_CERTIFICATE",
+      "details": "Registered original certificate ST-AI-2024-8890 for John Doe",
+      "ipAddress": "172.16.0.12",
+      "timestamp": "2026-07-24T05:50:55.279Z"
+    },
+    {
+      "id": "log-3",
+      "userId": "user-admin",
+      "userEmail": "admin@quickcheck.ai",
+      "action": "SYSTEM_AUDIT",
+      "details": "Reviewed suspicious verification logs and platform statistics",
+      "ipAddress": "10.0.0.1",
+      "timestamp": "2026-08-08T05:50:55.279Z"
+    }
+  ],
+  "notifications": []
+}
