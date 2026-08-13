@@ -9,22 +9,23 @@ const { analyzeCertificateDocument } = require('../services/aiService');
 
 const router = express.Router();
 
-// On Vercel Serverless, use OS temp directory (/tmp)
-const uploadDir = process.env.VERCEL === '1'
-  ? os.tmpdir()
-  : path.join(__dirname, '../../uploads');
+const isVercel = process.env.VERCEL === '1';
 
-if (!fs.existsSync(uploadDir)) {
-  try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) {}
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `verify-${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`);
-  }
-});
+const storage = isVercel
+  ? multer.memoryStorage()
+  : multer.diskStorage({
+      destination: (req, file, cb) => {
+        const uploadDir = path.join(__dirname, '../../uploads');
+        if (!fs.existsSync(uploadDir)) {
+          try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) {}
+        }
+        cb(null, uploadDir);
+      },
+      filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `verify-${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`);
+      }
+    });
 
 const upload = multer({
   storage,
@@ -44,8 +45,17 @@ router.post('/', authMiddleware, upload.single('file'), async (req, res) => {
     const { certificateId, holderName, issuerName, courseAward, issueDate } = req.body;
     const userInputs = { certificateId, holderName, issuerName, courseAward, issueDate };
 
+    let tempFilePath = req.file.path;
+    let fileName = req.file.originalname;
+
+    if (isVercel || !tempFilePath) {
+      const ext = path.extname(fileName) || '.png';
+      tempFilePath = path.join(os.tmpdir(), `verify-${Date.now()}${ext}`);
+      fs.writeFileSync(tempFilePath, req.file.buffer);
+    }
+
     // Run AI analysis
-    const aiResult = await analyzeCertificateDocument(req.file.path, req.file.originalname, userInputs);
+    const aiResult = await analyzeCertificateDocument(tempFilePath, fileName, userInputs);
 
     // Look up org record details
     const matchedCert = certificateId ? store.findCertByCertId(certificateId) : null;
@@ -69,7 +79,7 @@ router.post('/', authMiddleware, upload.single('file'), async (req, res) => {
       positiveIndicators: aiResult.positiveIndicators || [],
       forensicDetails: aiResult.forensicDetails || {},
       ocr: aiResult.ocr || {},
-      fileUrl: `/uploads/${req.file.filename}`,
+      fileUrl: req.file.filename ? `/uploads/${req.file.filename}` : 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&auto=format&fit=crop&q=80',
       fileName: req.file.originalname,
       qrCodeUrl,
       publicVerifyUrl,
@@ -108,7 +118,6 @@ router.get('/:id', (req, res) => {
  */
 router.get('/public/:idOrHash', (req, res) => {
   const param = req.params.idOrHash;
-  // Check verification result first, then certificate master record
   const result = store.getVerificationById(param);
   if (result) {
     return res.json({

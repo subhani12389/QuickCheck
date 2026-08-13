@@ -10,22 +10,23 @@ const { analyzeCertificateDocument } = require('../services/aiService');
 
 const router = express.Router();
 
-// On Vercel Serverless, use OS temp directory (/tmp)
-const uploadDir = process.env.VERCEL === '1'
-  ? os.tmpdir()
-  : path.join(__dirname, '../../uploads');
+const isVercel = process.env.VERCEL === '1';
 
-if (!fs.existsSync(uploadDir)) {
-  try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) {}
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `portal-${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`);
-  }
-});
+const storage = isVercel
+  ? multer.memoryStorage()
+  : multer.diskStorage({
+      destination: (req, file, cb) => {
+        const uploadDir = path.join(__dirname, '../../uploads');
+        if (!fs.existsSync(uploadDir)) {
+          try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) {}
+        }
+        cb(null, uploadDir);
+      },
+      filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `portal-${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`);
+      }
+    });
 
 const upload = multer({
   storage,
@@ -82,6 +83,16 @@ router.post('/portal-verify/:orgIdOrCode', upload.single('file'), async (req, re
       return res.status(400).json({ error: 'Student Name and Email Address are required' });
     }
 
+    // Determine temporary filePath for analysis
+    let tempFilePath = req.file.path;
+    let fileName = req.file.originalname;
+
+    if (isVercel || !tempFilePath) {
+      const ext = path.extname(fileName) || '.png';
+      tempFilePath = path.join(os.tmpdir(), `portal-${Date.now()}${ext}`);
+      fs.writeFileSync(tempFilePath, req.file.buffer);
+    }
+
     const userInputs = {
       certificateId,
       holderName: studentName,
@@ -90,7 +101,7 @@ router.post('/portal-verify/:orgIdOrCode', upload.single('file'), async (req, re
     };
 
     // Run AI analysis pipeline
-    const aiResult = await analyzeCertificateDocument(req.file.path, req.file.originalname, userInputs);
+    const aiResult = await analyzeCertificateDocument(tempFilePath, fileName, userInputs);
 
     const resId = 'res-' + Date.now();
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(resId)}`;
@@ -114,7 +125,7 @@ router.post('/portal-verify/:orgIdOrCode', upload.single('file'), async (req, re
       positiveIndicators: aiResult.positiveIndicators || [],
       forensicDetails: aiResult.forensicDetails || {},
       ocr: aiResult.ocr || {},
-      fileUrl: `/uploads/${req.file.filename}`,
+      fileUrl: req.file.filename ? `/uploads/${req.file.filename}` : 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&auto=format&fit=crop&q=80',
       fileName: req.file.originalname,
       qrCodeUrl,
       publicVerifyUrl,
