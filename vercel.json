@@ -1,26 +1,16 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "server/src/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["../client/dist/**"]
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server/src/index.js"
+      "source": "/api/(.*)",
+      "destination": "/server/src/index.js"
     },
     {
-      "src": "/uploads/(.*)",
-      "dest": "server/src/index.js"
+      "source": "/uploads/(.*)",
+      "destination": "/server/src/index.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "server/src/index.js"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
