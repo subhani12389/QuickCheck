@@ -2,15 +2,20 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const store = require('../db/store');
 const { authMiddleware } = require('../middleware/auth');
 const { analyzeCertificateDocument } = require('../services/aiService');
 
 const router = express.Router();
 
-const uploadDir = path.join(__dirname, '../../uploads');
+// On Vercel Serverless, use OS temp directory (/tmp)
+const uploadDir = process.env.VERCEL === '1'
+  ? os.tmpdir()
+  : path.join(__dirname, '../../uploads');
+
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+  try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) {}
 }
 
 const storage = multer.diskStorage({
